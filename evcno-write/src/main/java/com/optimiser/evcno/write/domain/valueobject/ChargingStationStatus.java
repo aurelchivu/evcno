@@ -5,8 +5,8 @@ import java.util.Map;
 
 public enum ChargingStationStatus {
 
-    OPERATIONAL(0L, "operational"),
-    MAINTENANCE(1L, "maintenance");
+    OPERATIONAL(0L, "Operational"),
+    MAINTENANCE(1L, "Maintenance");
 
     private final Long code;
     private final String description;
