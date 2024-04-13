@@ -31,6 +31,7 @@
     <!-- Miscellaneous -->
     <lombok.version>1.18.32</lombok.version>
     <reactor-core.version>3.6.5</reactor-core.version>
+    <axon.version>4.9.3</axon.version>
 
   </properties>
 
@@ -64,6 +65,11 @@
         <groupId>io.projectreactor</groupId>
         <artifactId>reactor-core</artifactId>
         <version>${reactor-core.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.axonframework</groupId>
+        <artifactId>axon-modelling</artifactId>
+        <version>${axon.version}</version>
       </dependency>
 
 
