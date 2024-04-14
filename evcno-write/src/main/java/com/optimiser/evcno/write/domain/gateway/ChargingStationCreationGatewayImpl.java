@@ -10,6 +10,6 @@ public class ChargingStationCreationGatewayImpl implements ChargingStationCreati
 
     @Override
     public Mono<ChargingStationId> createChargingStation(ChargingStation chargingStation) {
-        return null;
+        return Mono.just(new ChargingStationId());
     }
 }

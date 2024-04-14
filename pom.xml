@@ -32,6 +32,9 @@
     <lombok.version>1.18.32</lombok.version>
     <reactor-core.version>3.6.5</reactor-core.version>
     <axon.version>4.9.3</axon.version>
+    <commons-chain.version>1.2</commons-chain.version>
+    <swagger.version>2.2.21</swagger.version>
+    <jakarta-validation.version>3.1.0-M2</jakarta-validation.version>
 
   </properties>
 
@@ -70,6 +73,21 @@
         <groupId>org.axonframework</groupId>
         <artifactId>axon-modelling</artifactId>
         <version>${axon.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-chain</groupId>
+        <artifactId>commons-chain</artifactId>
+        <version>${commons-chain.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.swagger.core.v3</groupId>
+        <artifactId>swagger-annotations</artifactId>
+        <version>${swagger.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.validation</groupId>
+        <artifactId>jakarta.validation-api</artifactId>
+        <version>${jakarta-validation.version}</version>
       </dependency>
 
 

@@ -3,7 +3,7 @@ package com.optimiser.evcno.write.domain.valueobject;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum StationType {
+public enum ChargingStationType {
 
     STANDARD(0L, "Standard"),
     FAST_CHARGING(1L, "FastCharging");
@@ -13,13 +13,13 @@ public enum StationType {
     private static final String UNSUPPORTED_STATION_TYPE_MESSAGE =
             "Unsupported Station Type";
 
-    StationType(Long code, String description) {
+    ChargingStationType(Long code, String description) {
         this.code = code;
         this.description = description;
     }
 
-    public static StationType forValue(String value) {
-        StationType result = Holder.MAP.get(value);
+    public static ChargingStationType forValue(String value) {
+        ChargingStationType result = Holder.MAP.get(value);
         if (result == null) {
             throw new IllegalArgumentException(UNSUPPORTED_STATION_TYPE_MESSAGE + value);
         }
@@ -31,6 +31,6 @@ public enum StationType {
     }
 
     private static class Holder {
-        static final Map<String, StationType> MAP = new HashMap<>();
+        static final Map<String, ChargingStationType> MAP = new HashMap<>();
     }
 }
