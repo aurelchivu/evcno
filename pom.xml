@@ -27,6 +27,7 @@
     <!-- Spring Related -->
     <spring-boot.version>3.2.4</spring-boot.version>
     <spring-boot.maven.plugin.version>3.2.4</spring-boot.maven.plugin.version>
+    <spring-boot-starter-webflux.version>3.2.4</spring-boot-starter-webflux.version>
 
     <!-- Miscellaneous -->
     <lombok.version>1.18.32</lombok.version>
@@ -35,6 +36,8 @@
     <commons-chain.version>1.2</commons-chain.version>
     <swagger.version>2.2.21</swagger.version>
     <jakarta-validation.version>3.1.0-M2</jakarta-validation.version>
+    <jackson-module-parameter-names.version>2.17.0</jackson-module-parameter-names.version>
+
 
   </properties>
 
@@ -57,12 +60,18 @@
         <artifactId>spring-boot-starter-test</artifactId>
         <version>${spring-boot.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webflux</artifactId>
+        <version>${spring-boot-starter-webflux.version}</version>
+      </dependency>
 
       <!-- Miscellaneous -->
       <dependency>
         <groupId>org.projectlombok</groupId>
         <artifactId>lombok</artifactId>
         <version>${lombok.version}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>io.projectreactor</groupId>
@@ -89,6 +98,12 @@
         <artifactId>jakarta.validation-api</artifactId>
         <version>${jakarta-validation.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-parameter-names</artifactId>
+        <version>${jackson-module-parameter-names.version}</version>
+      </dependency>
+
 
 
     </dependencies>
