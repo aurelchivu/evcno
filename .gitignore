@@ -6,6 +6,9 @@
 *.iws
 *.ipr
 
+#.env file
+.env
+
 # Eclipse files
 .classpath
 .project
