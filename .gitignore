@@ -48,5 +48,7 @@ Thumbs.db
 # Documentation
 .bkp
 
-# Sonar Token Files
+# The evcno published language should only contain contracts not their implementations
+# (although the classes are auto-generated in the project they will not be commited)
+/evcno-published-language/src/main/java/com/optimiser/evcno/published/language/infrastructure/avro/**
 

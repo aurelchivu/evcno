@@ -13,16 +13,19 @@
 
   <modules>
     <module>evcno-write</module>
+    <module>evcno-published-language</module>
   </modules>
 
   <properties>
     <java.version>21</java.version>
+    <company.name>Evcno</company.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <!-- Maven Related -->
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven.compiler.release>${java.version}</maven.compiler.release>
+    <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
 
     <!-- Spring Related -->
     <spring-boot.version>3.2.4</spring-boot.version>
@@ -30,7 +33,6 @@
     <spring-boot-starter-webflux.version>3.2.4</spring-boot-starter-webflux.version>
     <spring-kafka.version>3.1.4</spring-kafka.version>
     <stream-binder-kafka.version>4.1.1</stream-binder-kafka.version>
-
 
     <!-- Miscellaneous -->
     <lombok.version>1.18.32</lombok.version>
@@ -41,7 +43,17 @@
     <jakarta-validation.version>3.1.0-M2</jakarta-validation.version>
     <jackson-module-parameter-names.version>2.17.0</jackson-module-parameter-names.version>
     <apache-commons-lang3.version>3.14.0</apache-commons-lang3.version>
+    <spotless.version>2.43.0</spotless.version>
+    <google-java-format.version>1.22.0</google-java-format.version>
+    <git-build-hook-maven-plugin.version>3.4.1</git-build-hook-maven-plugin.version>
+    <avro-maven-plugin.version>1.11.3</avro-maven-plugin.version>
+    <mapstruct.version>1.5.5.Final</mapstruct.version>
+    <mapstruct-processor.version>1.5.5.Final</mapstruct-processor.version>
 
+    <!-- Avro Serialization -->
+    <kafka-avro-serializer.version>7.6.1</kafka-avro-serializer.version>
+    <avro.version>1.11.3</avro.version>
+    <confluent-common-config.version>7.6.1</confluent-common-config.version>
 
   </properties>
 
@@ -130,6 +142,33 @@
         <artifactId>commons-lang3</artifactId>
         <version>${apache-commons-lang3.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct</artifactId>
+        <version>${mapstruct.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mapstruct</groupId>
+        <artifactId>mapstruct-processor</artifactId>
+        <version>${mapstruct-processor.version}</version>
+      </dependency>
+
+      <!-- Avro Serialization -->
+      <dependency>
+        <groupId>io.confluent</groupId>
+        <artifactId>kafka-avro-serializer</artifactId>
+        <version>${kafka-avro-serializer.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro</artifactId>
+        <version>${avro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.confluent</groupId>
+        <artifactId>common-config</artifactId>
+        <version>${confluent-common-config.version}</version>
+      </dependency>
 
     </dependencies>
   </dependencyManagement>
@@ -151,8 +190,95 @@
             </excludes>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <configuration>
+            <!-- optional: limit format enforcement to just the files changed by this feature branch -->
+            <!-- ratchetFrom>origin/master</ratchetFrom -->
+            <encoding>UTF-8</encoding>
+            <!-- define a language-specific format -->
+            <java>
+              <!-- no need to specify files, inferred automatically, but you can if you want -->
+
+              <!-- apply a specific flavor of google-java-format and reflow long strings -->
+              <googleJavaFormat>
+                <version>${google-java-format.version}</version>
+                <style>AOSP</style>
+                <reflowLongStrings>true</reflowLongStrings>
+              </googleJavaFormat>
+
+              <!-- make sure every file has the following copyright header.
+                optionally, Spotless can set copyright years by digging
+                through git history (see "license" section below) -->
+              <licenseHeader>
+                <content>/* ${company.name} (C)$YEAR */
+                </content>  <!-- or <file>${project.basedir}/license-header</file> -->
+              </licenseHeader>
+            </java>
+            <sql>
+              <includes>
+                <include>**/*.sql</include>
+              </includes>
+              <dbeaver/>
+            </sql>
+            <json>
+              <includes>    <!-- You have to set the target manually -->
+                <include>**/*.json</include>
+              </includes>
+              <gson>
+                <indentSpaces>2
+                </indentSpaces>
+                <sortByKeys>false
+                </sortByKeys>
+              </gson>
+            </json>
+          </configuration>
+          <executions>
+            <execution>
+              <goals>
+                <goal>check</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>apply</id>
+              <phase>process-classes</phase>
+              <goals>
+                <goal>apply</goal>
+              </goals>
+            </execution>
+          </executions>
+          <version>${spotless.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <includes>
+              <include>**/*Test.class</include>
+              <include>**/*IT*.java</include>
+            </includes>
+            <testSourceDirectory>src/test/java/</testSourceDirectory>
+
+            <forkCount>3</forkCount>
+            <reuseForks>true</reuseForks>
+            <argLine>@{argLine} -Xmx1024m</argLine>
+          </configuration>
+          <version>${maven-surefire-plugin.version}</version>
+        </plugin>
 
       </plugins>
     </pluginManagement>
   </build>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+    <repository>
+      <id>confluent</id>
+      <url>https://packages.confluent.io/maven/</url>
+    </repository>
+  </repositories>
 </project>

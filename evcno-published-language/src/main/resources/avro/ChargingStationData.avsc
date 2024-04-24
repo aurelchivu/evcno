@@ -1,0 +1,79 @@
+{
+  "type": "record",
+  "name": "ChargingStationDataAvro",
+  "namespace": "com.optimiser.evcno.published.language.infrastructure.avro.v1",
+  "fields": [
+    {
+      "name": "chargingStationId",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "name",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+//    {
+//      "name": "address",
+//      "type": [
+//        "null",
+//        "string"
+//      ],
+//      "default": null
+//    },
+    {
+      "name": "capacity",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+    {
+      "name": "availableChargingPoints",
+      "type": [
+        "null",
+        "int"
+      ],
+      "default": null
+    },
+//    {
+//      "name": "chargingStationType",
+//      "type": [
+//        "null",
+//        "string"
+//      ],
+//      "default": null
+//    },
+//    {
+//      "name": "chargingStationStatus",
+//      "type": [
+//        "null",
+//        "string"
+//      ],
+//      "default": null
+//    }
+    {
+      "name": "eventType",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "packageName",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
+}
