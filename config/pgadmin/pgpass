@@ -1,0 +1,2 @@
+host.docker.internal:5432:evcno_write_db:adminWrite:adminWrite
+host.docker.internal:5433:evcno_read_db:adminRead:adminRead

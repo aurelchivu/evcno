@@ -5,6 +5,7 @@ import static com.optimiser.evcno.write.infrastructure.kafka.handler.Constants.C
 import com.optimiser.evcno.write.domain.event.DomainEventPublisher;
 import com.optimiser.evcno.write.infrastructure.kafka.handler.EventHandlerChain;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.chain.Context;
 import org.apache.commons.chain.impl.ContextBase;

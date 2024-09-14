@@ -1,0 +1,231 @@
+version: '3.8'
+
+services:
+  evcno-read-postgres:
+    image: postgres:latest
+    container_name: evcno-read-postgres
+    hostname: evcno-read-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${EVCNO_READ_SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${EVCNO_READ_SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${EVCNO_READ_SPRING_DATASOURCE_DATABASE}
+      PGPORT: 5433
+    healthcheck:
+      test: "pg_isready -U adminRead -d evcno_read_db || exit 1"
+    ports:
+      - "${EVCNO_READ_POSTGRES_PORT_HOST}:${EVCNO_READ_POSTGRES_PORT_CONTAINER}"
+    volumes:
+      - pgdata-read:/var/lib/postgresql/data-read
+    networks:
+      - evcno_network
+
+  evcno-write-postgres:
+    image: postgres:latest
+    container_name: evcno-write-postgres
+    hostname: evcno-write-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${EVCNO_WRITE_SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${EVCNO_WRITE_SPRING_DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${EVCNO_WRITE_SPRING_DATASOURCE_DATABASE}
+    healthcheck:
+      test: "pg_isready -U adminWrite -d evcno_write_db || exit 1"
+    ports:
+      - "${EVCNO_WRITE_POSTGRES_PORT_HOST}:${EVCNO_WRITE_POSTGRES_PORT_CONTAINER}"
+    volumes:
+      - pgdata-write:/var/lib/postgresql/data-write
+    networks:
+      - evcno_network
+
+  evcno-pgadmin:
+    image: dpage/pgadmin4
+    container_name: evcno-pgadmin4
+    hostname: evcno-pgadmin4
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:80/misc/ping"]
+    ports:
+      - "${PGADMIN_PORT_HOST}:${PGADMIN_PORT_CONTAINER}"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: ${PGADMIN_CONFIG_SERVER_MODE}
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: ${PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED}
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+      - ./config/pgadmin/servers.json:/pgadmin4/servers.json # preconfigured servers/connections
+      - ./config/pgadmin/pgpass:/pgpass # passwords for the connections in this file
+    networks:
+      - evcno_network
+    depends_on:
+      - evcno-read-postgres
+      - evcno-write-postgres
+
+  evcno-axonserver:
+    image: axoniq/axonserver:latest
+    container_name: evcno-axonserver
+    hostname: evcno-axonserver
+    restart: always
+    healthcheck:
+      test: "curl --fail http://localhost:8024/actuator/health || exit 1"
+    volumes:
+      - axonserver-data:/axonserver/data
+      - axonserver-events:/axonserver/events
+      - axonserver-config:/axonserver/config:ro
+      - axonserver-plugins:/axonserver/plugins
+      - axonserver-log:/axonserver/log
+      - axonserver-extensions:/axonserver/exts
+    ports:
+      - "${AXONSERVER_PORT1_HOST}:${AXONSERVER_PORT1_CONTAINER}"
+      - "${AXONSERVER_PORT2_HOST}:${AXONSERVER_PORT2_CONTAINER}"
+      - "${AXONSERVER_PORT3_HOST}:${AXONSERVER_PORT3_CONTAINER}"
+    depends_on:
+      - evcno-read-postgres
+      - evcno-write-postgres
+    environment:
+      - AXONIQ.AXONSERVER.STANDALONE=${AXONSERVER_STANDALONE}
+    networks:
+      - evcno_network
+
+  evcno-prometheus:
+    build:
+      context: config/observability/prometheus
+      dockerfile: Dockerfile
+    container_name: evcno-prometheus
+    hostname: evcno-prometheus
+    restart: always
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:9090"]
+    volumes:
+      - prometheus_data:/prometheus
+    ports:
+      - "${PROMETHEUS_PORT_HOST}:${PROMETHEUS_PORT_CONTAINER}"
+    depends_on:
+      - evcno-read-postgres
+      - evcno-write-postgres
+      - evcno-pgadmin
+      - evcno-axonserver
+    links:
+      - evcno-axonserver
+    networks:
+      - evcno_network
+
+  evcno-grafana:
+    build:
+      context: config/observability/grafana
+      dockerfile: Dockerfile
+    image: grafana/grafana
+    container_name: evcno-grafana
+    hostname: evcno-grafana
+    restart: always
+    healthcheck:
+      test: "curl --fail http://localhost:3000/api/health || exit 1"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT_HOST}:${GRAFANA_PORT_CONTAINER}"
+    depends_on:
+      - evcno-read-postgres
+      - evcno-write-postgres
+      - evcno-pgadmin
+      - evcno-axonserver
+      - evcno-prometheus
+    links:
+      - evcno-prometheus
+    networks:
+      - evcno_network
+
+  evcno-sonarqube:
+    image: sonarqube:lts
+    restart: always
+    container_name: evcno-sonarqube
+    hostname: evcno-sonarqube
+    ports:
+      - "${SONARQUBE_PORT_HOST}:${SONARQUBE_PORT_CONTAINER}"
+    networks:
+      - evcno_network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
+    ports:
+      - "${ZOOKEEPER_PORT_HOST}:${ZOOKEEPER_PORT_CONTAINER}"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "${ZOOKEEPER_CLIENT_PORT}"
+      ZOOKEEPER_TICK_TIME: "${ZOOKEEPER_TICK_TIME}"
+    extra_hosts:
+      - "moby:127.0.0.1"
+    networks:
+      - evcno_network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
+    restart: always
+    ports:
+      - "${KAFKA_PORT_HOST}:${KAFKA_PORT_CONTAINER}"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,OUTSIDE://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,OUTSIDE://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "account, evcno"
+      KAFKA_BROKER_ID: 1
+
+    extra_hosts:
+      - "moby:127.0.0.1"
+    depends_on:
+      - zookeeper
+    networks:
+      - evcno_network
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    restart: always
+    ports:
+      - "8090:8090"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: 'zookeeper:2181'
+      SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8090
+      SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: PLAINTEXT://kafka:9092
+      SCHEMA_REGISTRY_DEBUG: 'true'
+#      This is not recommended. Needs a review and checks for full_transitive
+      SCHEMA_REGISTRY_AVRO_COMPATIBILITY_LEVEL: 'none'
+    depends_on:
+      - kafka
+    networks:
+      - evcno_network
+
+networks:
+  evcno_network:
+    driver: bridge
+
+volumes:
+  pgdata-write:
+  pgdata-read:
+  pgadmin:
+  prometheus_data:
+  grafana_data:
+  axonserver-data:
+    driver: local
+  axonserver-events:
+    driver: local
+  axonserver-plugins:
+    driver: local
+  axonserver-log:
+    driver: local
+  axonserver-extensions:
+    driver: local
+  axonserver-config:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PWD}/config/axonserver

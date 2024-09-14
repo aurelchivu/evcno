@@ -1,0 +1,26 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "evcno_write_db",
+      "Group": "Servers",
+      "Host": "host.docker.internal",
+      "Port": 5432,
+      "MaintenanceDB": "evcno_write_db",
+      "Username": "adminWrite",
+      "PassFile": "/pgpass",
+      "_PassFile": "This is a comment - The PassFile follow the pattern hostname:port:database:username:password",
+      "SSLMode": "prefer"
+    },
+    "2": {
+      "Name": "evcno_read_db",
+      "Group": "Servers",
+      "Host": "host.docker.internal",
+      "Port": 5433,
+      "MaintenanceDB": "evcno_read_db",
+      "Username": "adminRead",
+      "PassFile": "/pgpass",
+      "_PassFile": "This is a comment - The PassFile follow the pattern hostname:port:database:username:password",
+      "SSLMode": "prefer"
+    }
+  }
+}

@@ -12,26 +12,30 @@ import org.apache.commons.chain.Command;
 import org.apache.commons.chain.Context;
 import org.springframework.cloud.stream.function.StreamBridge;
 
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Slf4j
 @AllArgsConstructor
 public class ChargingStationCreatedEventHandler implements Command {
 
     private final StreamBridge streamBridge;
+    private final Set<String> processedEventIds = ConcurrentHashMap.newKeySet();
 
     @Override
     public boolean execute(Context context) throws Exception {
 
-//        if (context.get(CONTEXT_EVENT_KEY) instanceof ChargingStationCreatedEvent chargingStationCreatedEvent) {
-//
-//            ChargingStationDataAvro chargingStationDataAvro =
-//                    ChargingStationDataTranslator.INSTANCE.mapToChargingStationDataAvro(
-//                            chargingStationCreatedEvent.getChargingStation());
-//
-//            chargingStationDataAvro.setEventType(chargingStationCreatedEvent.getClass().getSimpleName());
-//            chargingStationDataAvro.setPackageName(chargingStationCreatedEvent.getClass().getPackageName());
-//
-//            outputDataStream(chargingStationDataAvro);
-//        }
+        if (context.get(CONTEXT_EVENT_KEY) instanceof ChargingStationCreatedEvent chargingStationCreatedEvent) {
+
+            ChargingStationDataAvro chargingStationDataAvro =
+                    ChargingStationDataTranslator.INSTANCE.mapToChargingStationDataAvro(
+                            chargingStationCreatedEvent.getChargingStation());
+
+            chargingStationDataAvro.setEventType(chargingStationCreatedEvent.getClass().getSimpleName());
+            chargingStationDataAvro.setPackageName(chargingStationCreatedEvent.getClass().getPackageName());
+
+            outputDataStream(chargingStationDataAvro);
+        }
 
         return CONTINUE_PROCESSING;
     }
@@ -41,3 +45,4 @@ public class ChargingStationCreatedEventHandler implements Command {
         streamBridge.send(DATA_SUPPLIER_OUT_0, chargingStationDataAvro);
     }
 }
+
