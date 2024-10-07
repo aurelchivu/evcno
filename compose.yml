@@ -11,6 +11,7 @@ services:
       POSTGRES_PASSWORD: ${EVCNO_READ_SPRING_DATASOURCE_PASSWORD}
       POSTGRES_DB: ${EVCNO_READ_SPRING_DATASOURCE_DATABASE}
       PGPORT: 5433
+      PGDATA: /var/lib/postgresql/data-read
     healthcheck:
       test: "pg_isready -U adminRead -d evcno_read_db || exit 1"
     ports:
@@ -29,6 +30,7 @@ services:
       POSTGRES_USER: ${EVCNO_WRITE_SPRING_DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${EVCNO_WRITE_SPRING_DATASOURCE_PASSWORD}
       POSTGRES_DB: ${EVCNO_WRITE_SPRING_DATASOURCE_DATABASE}
+      PGDATA: /var/lib/postgresql/data-write
     healthcheck:
       test: "pg_isready -U adminWrite -d evcno_write_db || exit 1"
     ports:
@@ -174,7 +176,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: kafka:9092
       SCHEMA_REGISTRY_KAFKASTORE_SECURITY_PROTOCOL: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "account, evcno"
+      KAFKA_CREATE_TOPICS: "chargingStation, evcno"
       KAFKA_BROKER_ID: 1
 
     extra_hosts:

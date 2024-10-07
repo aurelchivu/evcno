@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 
 @SpringBootApplication
-@EntityScan(basePackages = "com.accelerator.ledger.read.infrastructure.db.dbo")
+@EntityScan(basePackages = "com.optimiser.evcno.read.infrastructure.db.dbo")
 @EnableCaching
 public class EvcnoReadApp {
 

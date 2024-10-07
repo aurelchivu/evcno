@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 @EntityScan(
         basePackages = {
-                "com.accelerator.ledger.domain",
+                "com.optimiser.evcno.write.domain",
                 "org.axonframework.eventhandling.tokenstore",
                 "org.axonframework.modelling.saga.repository.jpa",
                 "org.axonframework.eventsourcing.eventstore.jpa"

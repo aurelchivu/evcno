@@ -1,0 +1,88 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  logicalFilePath="classpath:db/changelog/db.changelog.xml"
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+                   http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+  <changeSet author="Evcno Write DB" id="00001-1-0">
+    <createTable tableName="token_entry">
+      <column name="processor_name" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="segment" type="INT">
+        <constraints nullable="false"/>
+      </column>
+      <column name="owner" type="VARCHAR(255)"/>
+      <column name="timestamp" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="token" type="BLOB"/>
+      <column name="token_type" type="VARCHAR(255)"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="Evcno Write DB" id="00001-1-1">
+    <addPrimaryKey columnNames="processor_name, segment" constraintName="token_entry_pkey"
+      tableName="token_entry"/>
+  </changeSet>
+  <changeSet author="Evcno Write DB" id="00001-1-2">
+    <createTable tableName="domain_event_entry">
+      <column autoIncrement="true" name="global_index" type="BIGINT">
+        <constraints primaryKey="true" primaryKeyName="domain_event_entry_pkey"/>
+      </column>
+      <column name="type" type="VARCHAR(255)"/>
+      <column name="aggregate_identifier" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true" uniqueConstraintName="idx_domain_event_entry"/>
+      </column>
+      <column name="sequence_number" type="BIGINT">
+        <constraints nullable="false" unique="true" uniqueConstraintName="idx_domain_event_entry"/>
+      </column>
+      <column name="event_identifier" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="time_stamp" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="payload_type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="payload_revision" type="VARCHAR(255)"/>
+      <column name="payload" type="BLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="meta_data" type="BLOB"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="Evcno Write DB" id="00001-1-4">
+    <createTable tableName="snapshot_event_entry">
+      <column name="type" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="snapshot_event_entry_pkey"/>
+      </column>
+      <column name="aggregate_identifier" type="VARCHAR(255)">
+        <constraints primaryKey="true" primaryKeyName="snapshot_event_entry_pkey"/>
+      </column>
+      <column name="sequence_number" type="BIGINT">
+        <constraints primaryKey="true" primaryKeyName="snapshot_event_entry_pkey"/>
+      </column>
+      <column name="event_identifier" type="VARCHAR(255)">
+        <constraints nullable="false" unique="true"/>
+      </column>
+      <column name="time_stamp" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="payload_type" type="VARCHAR(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="payload_revision" type="VARCHAR(255)"/>
+      <column name="payload" type="BLOB">
+        <constraints nullable="false"/>
+      </column>
+      <column name="meta_data" type="BLOB"/>
+    </createTable>
+  </changeSet>
+  <changeSet author="Evcno Write DB" id="00001-1-5">
+    <createSequence dataType="BIGINT" incrementBy="50" sequenceName="domain_event_entry_seq"/>
+  </changeSet>
+</databaseChangeLog>
+  <!-- this script is compatible with PostgreSQL only
+  to use in other databases please adapt the script-->

@@ -63,6 +63,10 @@
     <kafka-avro-serializer.version>7.6.1</kafka-avro-serializer.version>
     <avro.version>1.11.3</avro.version>
     <confluent-common-config.version>7.6.1</confluent-common-config.version>
+
+    <!-- Persistence Related -->
+    <liquibase.version>4.24.0</liquibase.version>
+    <postgresql.version>42.6.0</postgresql.version>
   </properties>
 
   <dependencyManagement>
